@@ -81,18 +81,15 @@ module.exports = {
     const insertReview = `INSERT INTO Reviews (product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness)
       VALUES (${params.product_id}, ${params.rating}, ${params.date}, '${params.summary.replace("'", "''")}', '${params.body.replace("'", "''")}', ${params.recommend}, ${params.reported}, '${params.reviewer_name.replace("'", "''")}', '${params.reviewer_email}', ${params.response}, ${params.helpfulness})`;
 
-    // set sequence to be greater than max id value, avoid dup, only needs to be used once if data is out of sync
-    // If anything this should be in the sql, run at the very end to correct the sequences
-    // db.query("SELECT setval('public.reviews_review_id_seq', (SELECT MAX(review_id) FROM reviews)+1);")
-    // db.query("SELECT setval('public.reviewsphotos_photo_id_seq', (SELECT MAX(photo_id) FROM reviewsphotos)+1);")
-    // db.query("SELECT setval('public.charreviews_charreview_id_seq', (SELECT MAX(charreview_id) FROM charreviews)+1);")
-
     // insert our review into db
     await db.query(insertReview)
       .then(() => {
         console.log('review inserted');
       })
-      .catch((err) => console.error('review error: ', err))
+      .catch((err) => {
+        console.error('review error: ', err)
+        cb(err)
+      })
 
     // get id of the review that we just inserted
     let linkReview = 0;
@@ -103,13 +100,15 @@ module.exports = {
 
     // insert all photos
     await params.photos.forEach((photo) => {
-      db.query(`INSERT INTO ReviewsPhotos (review_id, url)
-          VALUES (${linkReview}, '${photo}')`)
+      db.query(`INSERT INTO ReviewsPhotos (review_id, url) VALUES (${linkReview}, '${photo}')`)
         .then(() => {
           console.log('photo inserted');
         })
-        .catch((err) => console.error('photos error: ', err))
-    })
+        .catch((err) => {
+          console.error('photos error: ', err)
+          cb(err)
+        })
+    });
 
     // insert all keys
     const charKeys = Object.keys(params.characteristics);
@@ -119,8 +118,12 @@ module.exports = {
         .then(() => {
           console.log('key inserted')
         })
-        .catch((err) => console.error('char error: ', err))
+        .catch((err) => {
+          console.error('char error: ', err)
+          cb(err)
+        })
     })
+
     cb();
   },
   setHelpful: (cb, params) => {

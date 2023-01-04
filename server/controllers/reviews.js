@@ -11,8 +11,8 @@ module.exports = {
         // formatting data object
         const data = {
           product_id: req.params.product_id,
-          page: 0,
-          count: modelRes.length,
+          page: Math.floor(modelRes.rowCount / 2),
+          count: modelRes.rowCount,
           results: modelRes.rows.map((resObj, index) => {
             return {
               review_id: resObj.review_id,
@@ -41,16 +41,6 @@ module.exports = {
         console.error(err);
         res.status(404).send(err);
       } else {
-        /*
-          rating: { 1: val, 2: val, 3: val, 4: val, 5: val}  -from reviews
-          recommend: { true: val, false: val}  -from reviews
-          characteristics: {
-            "name from characteristics table": {  -from characteristics
-              "id": char_id,      -from charreview
-              "value": AVERAGE of all values      -from charreview
-            }
-          }
-        */
         const data = {
           product_id: req.params.product_id,
           rating: metaRes[0],
@@ -66,7 +56,7 @@ module.exports = {
   },
   post: (req, res) => {
     const reviewData = {
-      product_id: req.body.product_id,
+      product_id: req.params.product_id,
       rating: req.body.rating,
       date: Date.now(),
       summary: req.body.summary || '',
