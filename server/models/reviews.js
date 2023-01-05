@@ -20,7 +20,7 @@ module.exports = {
     });
   },
   getMeta: async (cb, params) => {
-    console.log(params);
+    // console.log(params);
     // need to build objects for: ratings, recommended, characteristics, objects for each characteristic name
     const totalQuery = `SELECT count(*) FROM reviews WHERE product_id = ${params.product_id}`;
     const recommendedQuery = `SELECT count(*) FROM reviews WHERE recommend AND product_id = ${params.product_id}`;
@@ -37,36 +37,36 @@ module.exports = {
 
     let ratingObj = {};
     for (let i = 1; i < 6; i++) {
-      console.time(`rating ${i}`);
+      // console.time(`rating ${i}`);
       db.query(`SELECT count(*) FROM reviews WHERE product_id = ${params.product_id} AND rating = ${i}`)
         .then((res) => {
           ratingObj[i] = Number(res.rows[0].count);
-          console.timeEnd(`rating ${i}`);
+          // console.timeEnd(`rating ${i}`);
         })
     }
 
     // object for recommend and characteristics
     let resObj = {};
     let charObj = {};
-    console.time('total');
+    // console.time('total');
     db.query(totalQuery)
       .then((total) => {
         let max = total.rows[0].count;
         let recCount;
-        console.timeEnd('total');
-        console.time('recommend');
+        // console.timeEnd('total');
+        // console.time('recommend');
         db.query(recommendedQuery)
           .then((recs) => {
             recCount = recs.rows[0].count;
             resObj['true'] = recCount;
             resObj['false'] = max - recCount;
-            console.timeEnd('recommend');
-            console.time('char_id, name query');
+            // console.timeEnd('recommend');
+            // console.time('char_id, name query');
             db.query(`SELECT char_id, name FROM characteristics WHERE product_id = ${params.product_id}`)
               .then((charRes) => {
-                console.timeEnd('char_id, name query');
+                // console.timeEnd('char_id, name query');
                 return Promise.all(charRes.rows.map(async (char, i) => {
-                  console.time('chars' + i);
+                  // console.time('chars' + i);
                   await db.query(`SELECT value FROM charreviews WHERE char_id = ${char.char_id}`)
                     .then((valueRes) => {
                       const avg = valueRes.rows.reduce((acc, val) => {
@@ -77,7 +77,7 @@ module.exports = {
                         id: Number(char.char_id),
                         value: JSON.stringify(avg / valueRes.rows.length),
                       };
-                      console.timeEnd('chars' + i);
+                      // console.timeEnd('chars' + i);
                     })
                     .catch((err) => console.error(err))
                 }))
@@ -100,10 +100,10 @@ module.exports = {
       VALUES (${params.product_id}, ${params.rating}, ${params.date}, '${params.summary.replace("'", "''")}', '${params.body.replace("'", "''")}', ${params.recommend}, ${params.reported}, '${params.reviewer_name.replace("'", "''")}', '${params.reviewer_email}', ${params.response}, ${params.helpfulness})`;
 
     // insert our review into db
-    console.time('insert review');
+    // console.time('insert review');
     await db.query(insertReview)
       .then((res) => {
-        console.timeEnd('insert review');
+        // console.timeEnd('insert review');
         // console.log(res);
       })
       .catch((err) => {
@@ -113,20 +113,20 @@ module.exports = {
 
     // get id of the review that we just inserted
     let linkReview = 0;
-    console.time('get review');
+    // console.time('get review');
     await db.query('SELECT review_id FROM reviews ORDER BY review_id DESC LIMIT 1')
       .then(({ rows }) => {
         linkReview = rows[0].review_id;
         // console.log(linkReview)
-        console.timeEnd('get review');
+        // console.timeEnd('get review');
       });
 
     // insert all photos
-    console.time('photo inserted');
+    // console.time('photo inserted');
     Promise.all(params.photos.map(async (photo) => {
       await db.query(`INSERT INTO ReviewsPhotos (review_id, url) VALUES (${linkReview}, '${photo}')`)
         .then(() => {
-          console.timeEnd('photo inserted');
+          // console.timeEnd('photo inserted');
         })
         .catch((err) => {
           console.error('photos error: ', err)
@@ -137,11 +137,11 @@ module.exports = {
     // insert all keys
     const charKeys = Object.keys(params.characteristics);
     await charKeys.forEach((key) => {
-      console.time('key inserted ' + key)
+      // console.time('key inserted ' + key)
       db.query(`INSERT INTO CharReviews (char_id, review_id, value)
       VALUES ((SELECT char_id FROM characteristics WHERE product_id = ${params.product_id} AND name = '${key}'), ${linkReview}, ${params.characteristics[key]})`)
         .then(() => {
-          console.timeEnd('key inserted ' + key)
+          // console.timeEnd('key inserted ' + key)
         })
         .catch((err) => {
           console.error('char error: ', err)

@@ -105,7 +105,7 @@ module.exports = {
 }
 
 const testData = {
-  product_id: 25,
+  product_id: 1000001,
   rating: 5,
   date: Date.now(),
   summary: "big summary",
