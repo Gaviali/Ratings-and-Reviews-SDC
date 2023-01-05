@@ -3,7 +3,7 @@ const model = require('../models');
 module.exports = {
   getReview: (req, res) => {
     const query = {
-      product_id: Number(req.params.product_id) || Number(req.query.product_id),
+      product_id: (req.params.product_id) || (req.query.product_id),
       page: Number(req.params.page) || Number(req.query.page) || 0,
       count: Number(req.params.count) || Number(req.query.count)
     }
@@ -46,7 +46,7 @@ module.exports = {
         res.status(404).send(err);
       } else {
         const data = {
-          product_id: req.params,
+          product_id: req.params.product_id,
           rating: metaRes[0],
           recommend: {
             true: Number(metaRes[1].true),

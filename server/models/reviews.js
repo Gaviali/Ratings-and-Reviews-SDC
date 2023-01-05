@@ -69,13 +69,13 @@ module.exports = {
                   console.time('chars' + i);
                   await db.query(`SELECT value FROM charreviews WHERE char_id = ${char.char_id}`)
                     .then((valueRes) => {
-                      let avg = valueRes.rows.reduce((acc, val) => {
+                      const avg = valueRes.rows.reduce((acc, val) => {
                         acc += val.value;
                         return acc;
                       }, 0);
                       charObj[char.name] = {
                         id: Number(char.char_id),
-                        value: avg /= valueRes.rows.length,
+                        value: JSON.stringify(avg / valueRes.rows.length),
                       };
                       console.timeEnd('chars' + i);
                     })
