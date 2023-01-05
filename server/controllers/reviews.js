@@ -2,7 +2,11 @@ const model = require('../models');
 
 module.exports = {
   getReview: (req, res) => {
-    // console.log('parameters: ', req.params)
+    const query = {
+      product_id: Number(req.params.product_id) || Number(req.query.product_id),
+      page: Number(req.params.page) || Number(req.query.page) || 0,
+      count: Number(req.params.count) || Number(req.query.count)
+    }
     model.reviews.getReview((err, modelRes) => {
       if (err) {
         console.error(err);
@@ -10,9 +14,9 @@ module.exports = {
       } else {
         // formatting data object
         const data = {
-          product_id: req.params.product_id,
-          page: Math.floor(modelRes.rowCount / 2),
-          count: modelRes.rowCount,
+          product_id: query.product_id,
+          page: query.page || 1,
+          count: query.count || 5,
           results: modelRes.rows.map((resObj, index) => {
             return {
               review_id: resObj.review_id,
@@ -25,7 +29,6 @@ module.exports = {
               reviewer_name: resObj.reviewer_name,
               reviewer_email: resObj.reviewer_email,
               response: resObj.response,
-              // === 'null' ? JSON.parse(resObj.response) : resObj.response,
               helpfulness: resObj.helpfulness,
               photos: resObj.reviewsphotos,
             };
@@ -33,16 +36,17 @@ module.exports = {
         };
         res.status(200).send(data);
       }
-    }, req.params);
+    }, query);
   },
   getMeta: (req, res) => {
+    // console.time('controller');
     model.reviews.getMeta((err, metaRes) => {
       if (err) {
         console.error(err);
         res.status(404).send(err);
       } else {
         const data = {
-          product_id: req.params.product_id,
+          product_id: req.params,
           rating: metaRes[0],
           recommend: {
             true: Number(metaRes[1].true),
@@ -51,6 +55,7 @@ module.exports = {
           characteristics: metaRes[2],
         };
         res.status(200).send(data);
+        // console.timeEnd('controller');
       }
     }, req.params);
   },
@@ -70,9 +75,6 @@ module.exports = {
       photos: req.body.photos,
       characteristics: req.body.characteristics,
     }
-
-    // console.log('all data here: ', reviewData);
-
     model.reviews.post((err, postRes) => {
       if (err) {
         console.error(err);
@@ -80,7 +82,7 @@ module.exports = {
       } else {
         res.status(201).send('successful post');
       }
-    }, reviewData)
+    }, testData)
   },
   putHelpful: (req, res) => {
     model.reviews.setHelpful((err, putRes) => {
@@ -101,3 +103,27 @@ module.exports = {
     }, req.params)
   }
 }
+
+const testData = {
+  product_id: 25,
+  rating: 5,
+  date: Date.now(),
+  summary: "big summary",
+  body: "body ",
+  recommend: true,
+  reported: false,
+  reviewer_name: "person name",
+  reviewer_email: "person@email.com",
+  response: null,
+  helpfulness: 0,
+  photos: [
+    "only one photo"
+  ],
+  characteristics: {
+    "Quality": 5,
+    "Length": 5
+  }
+}
+// photos being thrown in random places
+
+// https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfp/reviews/40353
