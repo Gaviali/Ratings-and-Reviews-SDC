@@ -14,7 +14,6 @@ const pool = new Pool({
 // runs postgres on the .sql file, where table is created
 // psql -d reviews -a -f databases/reviewsPg.sql
 
-console.log('test');
 module.exports = pool;
 
 // \l list all databases
