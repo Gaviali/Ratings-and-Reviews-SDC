@@ -30,6 +30,8 @@ if (cluster.isPrimary) {
   // app.use(morgan('dev'));
   app.use('/', router);
   app.use(express.static(path.join(__dirname, '../client/dist')));
+  
+  app.get("/loaderio-a3944bed63050bb1a9a17f22a732a7b7", (req, res) => res.send("loaderio-a3944bed63050bb1a9a17f22a732a7b7"));
 
   const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
