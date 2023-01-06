@@ -1,0 +1,8 @@
+*.env
+*.map
+bundle.js
+config.js
+node_modules/
+*.csv
+sdc_data
+ecosystem.config.js
