@@ -1,3 +1,4 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 const connectionString = 'postgresql://localhost:5432/reviews';
 const parser = require('csv-parser');
@@ -5,10 +6,11 @@ const fs = require('fs'); // maybe need promises
 
 const pool = new Pool({
   // connectionString,
-  user: 'jeffreyzhang',
-  host: 'localhost',
-  database: 'reviews',
-  port: 5432,
+  user: process.env.PGUSER,
+  host: process.env.PGHOST,
+  database: process.env.PGDATABASE,
+  password: process.env.PGPASSWORD,
+  port: process.env.PGPORT,
 });
 
 // runs postgres on the .sql file, where table is created

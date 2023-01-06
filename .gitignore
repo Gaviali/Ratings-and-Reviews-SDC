@@ -1,4 +1,4 @@
-*.env
+.env
 *.map
 bundle.js
 config.js
