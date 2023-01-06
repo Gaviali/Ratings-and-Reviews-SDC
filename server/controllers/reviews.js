@@ -62,18 +62,18 @@ module.exports = {
   post: (req, res) => {
     const reviewData = {
       product_id: req.params.product_id,
-      rating: req.body.rating,
+      rating: req.body.rating || 5,
       date: Date.now(),
-      summary: req.body.summary || '',
-      body: req.body.body,
-      recommend: req.body.recommend,
+      summary: req.body.summary || 'test summary',
+      body: req.body.body || 'test body',
+      recommend: req.body.recommend || true,
       reported: false,
-      reviewer_name: req.body.reviewer_name,
-      reviewer_email: req.body.reviewer_email,
+      reviewer_name: req.body.reviewer_name || 'test name',
+      reviewer_email: req.body.reviewer_email || 'test email',
       response: null,
       helpfulness: 0,
-      photos: req.body.photos,
-      characteristics: req.body.characteristics,
+      photos: req.body.photos || ['test photo'],
+      characteristics: req.body.characteristics || { 'Quality': 5 },
     }
     model.reviews.post((err, postRes) => {
       if (err) {
@@ -82,7 +82,7 @@ module.exports = {
       } else {
         res.status(201).send('successful post');
       }
-    }, testData)
+    }, reviewData)
   },
   putHelpful: (req, res) => {
     model.reviews.setHelpful((err, putRes) => {
@@ -104,26 +104,26 @@ module.exports = {
   }
 }
 
-const testData = {
-  product_id: 1000001,
-  rating: 5,
-  date: Date.now(),
-  summary: "big summary",
-  body: "body ",
-  recommend: true,
-  reported: false,
-  reviewer_name: "person name",
-  reviewer_email: "person@email.com",
-  response: null,
-  helpfulness: 0,
-  photos: [
-    "only one photo"
-  ],
-  characteristics: {
-    "Quality": 5,
-    "Length": 5
-  }
-}
+// const testData = {
+//   product_id: req.params.product_id,
+//   rating: 5,
+//   date: Date.now(),
+//   summary: "big summary",
+//   body: "body ",
+//   recommend: true,
+//   reported: false,
+//   reviewer_name: "person name",
+//   reviewer_email: "person@email.com",
+//   response: null,
+//   helpfulness: 0,
+//   photos: [
+//     "only one photo"
+//   ],
+//   characteristics: {
+//     "Quality": 5,
+//     "Length": 5
+//   }
+// }
 // photos being thrown in random places
 
 // https://app-hrsei-api.herokuapp.com/api/fec2/hr-rfp/reviews/40353
