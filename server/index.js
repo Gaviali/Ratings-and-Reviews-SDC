@@ -5,21 +5,21 @@ require('dotenv').config();
 const path = require('path');
 const morgan = require('morgan');
 
-// if (cluster.isPrimary) {
-//   console.log(`primary ${process.pid} running`);
-//   console.log('max workers: ', cpus().length)
-//   // two workers seems optimal
-//   for (let i = 0; i < 2; i++) {
-//     console.log('worker: ' + i)
-//     cluster.fork();
-//   };
+if (cluster.isPrimary) {
+  console.log(`primary ${process.pid} running`);
+  console.log('max workers: ', cpus().length)
+  // two workers seems optimal
+  for (let i = 0; i < cpus().length; i++) {
+    console.log('worker: ' + i)
+    cluster.fork();
+  };
 
-//   cluster.on('exit', worker => {
-//     console.log(`worker ${worker.process.pid} died`);
-//     console.log('forking another worker')
-//     cluster.fork();
-//   });
-// } else {
+  cluster.on('exit', worker => {
+    console.log(`worker ${worker.process.pid} died`);
+    console.log('forking another worker')
+    cluster.fork();
+  });
+} else {
   const router = require('./router.js');
 
   const express = require('express');
@@ -37,4 +37,4 @@ const morgan = require('morgan');
   app.listen(PORT, () => {
     console.log(`Server listening at http://localhost:${PORT}`);
   });
-// }
+}
